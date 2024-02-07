@@ -17,6 +17,7 @@ import {
   Th,
   Thead,
   Tr,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -42,9 +43,9 @@ function App(props) {
   const [homepageurl, setHomepageurl] = useState(""); // 홈페이지
   const [companyType, setCompanyType] = useState("법인"); // 법인여부
   const [countryType, setCountryType] = useState("국내"); // 해외여부
-  const [stopTrading, setStopTrading] = useState(""); // 거래중지
-  const [contractPeriod1, setContractPeriod1] = useState(""); // 계약기간
-  const [contractPeriod2, setContractPeriod2] = useState(""); // 계약기간
+  // const [stopTrading, setStopTrading] = useState(""); // 거래중지
+  const [contractPeriod1, setContractPeriod1] = useState(""); // 계약기간1
+  const [contractPeriod2, setContractPeriod2] = useState(""); // 계약기간2
   const [registrationInformation, setRegistrationInformation] = useState(""); // 등록정보
   const [registrationDateTime, setRegistrationDateTime] = useState(""); // 등록날짜
   const [changeInformation, setChangeInformation] = useState(""); // 변경정보
@@ -53,6 +54,8 @@ function App(props) {
   const [offices, setOffices] = useState(""); // 사무소
   const [bankingInformation, setBankingInformation] = useState(""); // 은행정보
   const [accountNumber, setAccountNumber] = useState(""); // 계좌번호
+
+  const toast = useToast();
 
   // Daum Postcode 스크립트 URL
   const scriptUrl =
@@ -98,46 +101,81 @@ function App(props) {
     openPostcodePopup({ onComplete: handleComplete });
   };
 
-  const handleSubmit = async () => {
-    // 상태 값을 객체로 구성
-    const companyData = {
-      companyNumber,
-      abbreviated,
-      companyName,
-      representative,
-      responsiblefor,
-      businessType,
-      items,
-      postalCode,
-      primaryAddress,
-      detailedAddress,
-      phoneNumber,
-      faxNumber,
-      homepageurl,
-      companyType,
-      countryType,
-      stopTrading,
-      contractPeriod1,
-      contractPeriod2,
-      registrationInformation,
-      registrationDateTime,
-      changeInformation,
-      changeDateTime,
-      offices,
-      bankingInformation,
-      accountNumber,
-    };
+  // ------------------------------ 등록버튼 클릭시 서버로 전송 로직 ------------------------------
+  function handleSubmit() {
+    axios
+      .post("/api/account/add", {
+        custom: {
+          companyNumber: companyNumber,
+          abbreviated: abbreviated,
+          companyName: companyName,
+          representative: representative,
+          responsiblefor: responsiblefor,
+          businessType: businessType,
+          items: items,
+          postalCode: postalCode,
+          primaryAddress: primaryAddress,
+          detailedAddress: detailedAddress,
+          phoneNumber: phoneNumber,
+          faxNumber: faxNumber,
+          homepageurl: homepageurl,
+          companyType: companyType,
+          countryType: countryType,
+          contractPeriod1: contractPeriod1,
+          contractPeriod2: contractPeriod2,
+          registrationInformation: registrationInformation,
+          registrationDateTime: registrationDateTime,
+          changeInformation: changeInformation,
+          changeDateTime: changeDateTime,
+        },
+        account: {
+          offices: offices,
+          bankingInformation: bankingInformation,
+          accountNumber: accountNumber,
+          companyNumber: companyNumber,
+        },
+      })
+      .then(() => {
+        toast({
+          description: "거래처 등록 되었습니다.",
+          status: "success",
+        });
+      })
+      .catch(() => {
+        toast({
+          description: "거래처 등록 중 오류 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
 
-    try {
-      // axios.post 메서드를 사용하여 서버에 데이터 전송
-      const response = await axios.post("/api/your-endpoint", companyData);
-      console.log(response.data);
-      // 응답 처리 로직
-    } catch (error) {
-      console.error("Error sending data to server", error);
-      // 오류 처리 로직
-    }
-  };
+  // ------------------------------ 초기화 버튼 클릭시 실행되는 로직 ------------------------------
+  function handleReset() {
+    setCompanyNumber("");
+    setAbbreviated("");
+    setCompanyName("");
+    setRepresentative("");
+    setResponsiblefor("");
+    setBusinessType("");
+    setItems("");
+    setPostalCode("");
+    setPrimaryAddress("");
+    setDetailedAddress("");
+    setPhoneNumber("");
+    setFaxNumber("");
+    setHomepageurl("");
+    setCompanyType("법인");
+    setCountryType("국내");
+    setContractPeriod1("");
+    setContractPeriod2("");
+    setRegistrationInformation("");
+    setRegistrationDateTime("");
+    setChangeInformation("");
+    setChangeDateTime("");
+    setOffices("");
+    setBankingInformation("");
+    setAccountNumber("");
+  }
 
   return (
     <Box justifyContent="center" minW={"1200px"} p={10}>
@@ -161,7 +199,7 @@ function App(props) {
         alignItems={"center"}
       >
         <Flex gap={4} w={"1375px"} justifyContent={"flex-end"}>
-          <Button>초기화</Button>
+          <Button onClick={handleReset}>초기화</Button>
           <Button onClick={handleSubmit}>등록</Button>
           <Button>수정</Button>
           <Button>삭제</Button>
@@ -478,22 +516,22 @@ function App(props) {
             </HStack>
           </FormControl>
 
-          <FormControl mt={4}>
-            <HStack>
-              <FormLabel w={"80px"}>
-                <Flex justifyContent={"space-between"}>
-                  <Text>거</Text> <Text>래</Text> <Text>중</Text>
-                  <Text>지</Text>
-                </Flex>
-              </FormLabel>
-              <Checkbox
-                value={stopTrading}
-                onChange={(e) => setStopTrading(e.target.value)}
-                size={"lg"}
-                bottom={1}
-              />
-            </HStack>
-          </FormControl>
+          {/*<FormControl mt={4}>*/}
+          {/*  <HStack>*/}
+          {/*    <FormLabel w={"80px"}>*/}
+          {/*      <Flex justifyContent={"space-between"}>*/}
+          {/*        <Text>거</Text> <Text>래</Text> <Text>중</Text>*/}
+          {/*        <Text>지</Text>*/}
+          {/*      </Flex>*/}
+          {/*    </FormLabel>*/}
+          {/*    <Checkbox*/}
+          {/*      value={stopTrading}*/}
+          {/*      onChange={(e) => setStopTrading(e.target.value)}*/}
+          {/*      size={"lg"}*/}
+          {/*      bottom={1}*/}
+          {/*    />*/}
+          {/*  </HStack>*/}
+          {/*</FormControl>*/}
 
           <FormControl mt={4}>
             <HStack>
