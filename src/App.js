@@ -25,8 +25,6 @@ import { useDaumPostcodePopup } from "react-daum-postcode";
 
 function App(props) {
   const emptyRows = new Array(11).fill(null);
-  const [value, setValue] = useState("법인");
-  const [companyCountry, setCompanyCountry] = useState("국내");
 
   // ----------------------- 거래처 정보 상태 -----------------------
   const [companyNumber, setCompanyNumber] = useState(""); // 사업자번호
@@ -42,13 +40,19 @@ function App(props) {
   const [phoneNumber, setPhoneNumber] = useState(""); // 전화번호
   const [faxNumber, setFaxNumber] = useState(""); // 팩스번호
   const [homepageurl, setHomepageurl] = useState(""); // 홈페이지
-  const [companyType, setCompanyType] = useState(""); // 법인여부
-  const [countryType, setCountryType] = useState(""); // 해외여부
+  const [companyType, setCompanyType] = useState("법인"); // 법인여부
+  const [countryType, setCountryType] = useState("국내"); // 해외여부
   const [stopTrading, setStopTrading] = useState(""); // 거래중지
   const [contractPeriod1, setContractPeriod1] = useState(""); // 계약기간
   const [contractPeriod2, setContractPeriod2] = useState(""); // 계약기간
   const [registrationInformation, setRegistrationInformation] = useState(""); // 등록정보
+  const [registrationDateTime, setRegistrationDateTime] = useState(""); // 등록날짜
   const [changeInformation, setChangeInformation] = useState(""); // 변경정보
+  const [changeDateTime, setChangeDateTime] = useState(""); // 변경날짜
+
+  const [offices, setOffices] = useState(""); // 사무소
+  const [bankingInformation, setBankingInformation] = useState(""); // 은행정보
+  const [accountNumber, setAccountNumber] = useState(""); // 계좌번호
 
   // Daum Postcode 스크립트 URL
   const scriptUrl =
@@ -184,14 +188,23 @@ function App(props) {
                   <Text>번</Text> <Text>호</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"230px"} mr={28} />
+              <Input
+                value={companyName}
+                onChange={(e) => setCompanyNumber(e.target.value)}
+                w={"230px"}
+                mr={28}
+              />
 
               <FormLabel w={"80px"}>
                 <Flex mt={2} justifyContent="space-between">
                   <Text>약</Text> <Text>칭</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"250px"} />
+              <Input
+                value={abbreviated}
+                onChange={(e) => setAbbreviated(e.target.value)}
+                w={"250px"}
+              />
             </HStack>
           </FormControl>
 
@@ -203,7 +216,11 @@ function App(props) {
                   <Text>명</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"450px"} />
+              <Input
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                w={"450px"}
+              />
             </HStack>
           </FormControl>
 
@@ -214,14 +231,23 @@ function App(props) {
                   <Text>대</Text> <Text>표</Text> <Text>자</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"230px"} mr={28} />
+              <Input
+                value={representative}
+                onChange={(e) => setRepresentative(e.target.value)}
+                w={"230px"}
+                mr={28}
+              />
 
               <FormLabel w={"80px"}>
                 <Flex mt={2} justifyContent="space-between">
                   <Text>담</Text> <Text>당</Text> <Text>자</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"250px"} />
+              <Input
+                value={responsiblefor}
+                onChange={(e) => setResponsiblefor(e.target.value)}
+                w={"250px"}
+              />
             </HStack>
           </FormControl>
 
@@ -232,14 +258,23 @@ function App(props) {
                   <Text>업</Text> <Text>태</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"230px"} mr={28} />
+              <Input
+                value={businessType}
+                onChange={(e) => setBusinessType(e.target.value)}
+                w={"230px"}
+                mr={28}
+              />
 
               <FormLabel w={"80px"}>
                 <Flex mt={2} justifyContent="space-between">
                   <Text>종</Text> <Text>목</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"250px"} />
+              <Input
+                value={items}
+                onChange={(e) => setItems(e.target.value)}
+                w={"250px"}
+              />
             </HStack>
           </FormControl>
 
@@ -251,7 +286,11 @@ function App(props) {
                   <Text>호</Text>
                 </Flex>
               </FormLabel>
-              <Input value={postalCode} w={"230px"} />
+              <Input
+                onChange={(e) => setPostalCode(e.target.value)}
+                value={postalCode}
+                w={"230px"}
+              />
               <Button mr={10} onClick={handlePostCodeClick}>
                 검색
               </Button>
@@ -278,7 +317,11 @@ function App(props) {
                   <Text>소</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"450px"} />
+              <Input
+                value={detailedAddress}
+                onChange={(e) => setDetailedAddress(e.target.value)}
+                w={"450px"}
+              />
             </HStack>
           </FormControl>
 
@@ -290,7 +333,12 @@ function App(props) {
                   <Text>호</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"230px"} mr={28} />
+              <Input
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                w={"230px"}
+                mr={28}
+              />
 
               <FormLabel w={"80px"}>
                 <Flex mt={2} justifyContent="space-between">
@@ -298,7 +346,11 @@ function App(props) {
                   <Text>호</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"250px"} />
+              <Input
+                value={faxNumber}
+                onChange={(e) => setFaxNumber(e.target.value)}
+                w={"250px"}
+              />
             </HStack>
           </FormControl>
 
@@ -310,7 +362,11 @@ function App(props) {
                   <Text>지</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"450px"} />
+              <Input
+                value={homepageurl}
+                onChange={(e) => setHomepageurl(e.target.value)}
+                w={"450px"}
+              />
             </HStack>
           </FormControl>
 
@@ -322,7 +378,7 @@ function App(props) {
                   <Text>분</Text>
                 </Flex>
               </FormLabel>
-              <RadioGroup onChange={setValue} value={value}>
+              <RadioGroup onChange={setCompanyType} value={companyType}>
                 <HStack
                   justifyContent="center"
                   alignItems="center"
@@ -347,7 +403,7 @@ function App(props) {
                   <Text>부</Text>
                 </Flex>
               </FormLabel>
-              <RadioGroup onChange={setCompanyCountry} value={companyCountry}>
+              <RadioGroup onChange={setCountryType} value={countryType}>
                 <HStack
                   justifyContent="center"
                   alignItems="center"
@@ -375,7 +431,12 @@ function App(props) {
                   <Text>지</Text>
                 </Flex>
               </FormLabel>
-              <Checkbox size={"lg"} bottom={1} />
+              <Checkbox
+                value={stopTrading}
+                onChange={(e) => setStopTrading(e.target.value)}
+                size={"lg"}
+                bottom={1}
+              />
             </HStack>
           </FormControl>
 
@@ -387,9 +448,19 @@ function App(props) {
                   <Text>간</Text>
                 </Flex>
               </FormLabel>
-              <Input type="date" w={"230px"} />
+              <Input
+                value={contractPeriod1}
+                onChange={(e) => setContractPeriod1(e.target.value)}
+                type="date"
+                w={"230px"}
+              />
               <Text>~</Text>
-              <Input type="date" w={"230px"} />
+              <Input
+                value={contractPeriod2}
+                onChange={(e) => setContractPeriod2(e.target.value)}
+                type="date"
+                w={"230px"}
+              />
             </HStack>
           </FormControl>
 
@@ -401,8 +472,18 @@ function App(props) {
                   <Text>보</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"130px"} />
-              <Input type="datetime-local" w={"250px"} mr={7} />
+              <Input
+                value={registrationInformation}
+                onChange={(e) => setRegistrationInformation(e.target.value)}
+                w={"130px"}
+              />
+              <Input
+                value={registrationDateTime}
+                onChange={(e) => setRegistrationDateTime(e.target.value)}
+                type="datetime-local"
+                w={"250px"}
+                mr={7}
+              />
 
               <FormLabel w={"80px"}>
                 <Flex mt={2} justifyContent={"space-between"}>
@@ -410,8 +491,17 @@ function App(props) {
                   <Text>보</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"130px"} />
-              <Input type="datetime-local" w={"250px"} />
+              <Input
+                value={changeInformation}
+                onChange={(e) => setChangeInformation(e.target.value)}
+                w={"130px"}
+              />
+              <Input
+                value={changeDateTime}
+                onChange={(e) => setChangeDateTime(e.target.value)}
+                type="datetime-local"
+                w={"250px"}
+              />
             </HStack>
           </FormControl>
 
@@ -429,13 +519,22 @@ function App(props) {
               <Tbody>
                 <Tr>
                   <Td>
-                    <Input />
+                    <Input
+                      value={offices}
+                      onChange={(e) => setOffices(e.target.value)}
+                    />
                   </Td>
                   <Td>
-                    <Input />
+                    <Input
+                      value={bankingInformation}
+                      onChange={(e) => setBankingInformation(e.target.value)}
+                    />
                   </Td>
                   <Td>
-                    <Input />
+                    <Input
+                      value={accountNumber}
+                      onChange={(e) => setAccountNumber(e.target.value)}
+                    />
                   </Td>
                 </Tr>
               </Tbody>
