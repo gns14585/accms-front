@@ -98,6 +98,47 @@ function App(props) {
     openPostcodePopup({ onComplete: handleComplete });
   };
 
+  const handleSubmit = async () => {
+    // 상태 값을 객체로 구성
+    const companyData = {
+      companyNumber,
+      abbreviated,
+      companyName,
+      representative,
+      responsiblefor,
+      businessType,
+      items,
+      postalCode,
+      primaryAddress,
+      detailedAddress,
+      phoneNumber,
+      faxNumber,
+      homepageurl,
+      companyType,
+      countryType,
+      stopTrading,
+      contractPeriod1,
+      contractPeriod2,
+      registrationInformation,
+      registrationDateTime,
+      changeInformation,
+      changeDateTime,
+      offices,
+      bankingInformation,
+      accountNumber,
+    };
+
+    try {
+      // axios.post 메서드를 사용하여 서버에 데이터 전송
+      const response = await axios.post("/api/your-endpoint", companyData);
+      console.log(response.data);
+      // 응답 처리 로직
+    } catch (error) {
+      console.error("Error sending data to server", error);
+      // 오류 처리 로직
+    }
+  };
+
   return (
     <Box justifyContent="center" minW={"1200px"} p={10}>
       <Box>
@@ -112,6 +153,19 @@ function App(props) {
         >
           거래처 관리 시스템
         </Text>
+      </Box>
+      <Box
+        mt={5}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
+        <Flex gap={4} w={"1375px"} justifyContent={"flex-end"}>
+          <Button>초기화</Button>
+          <Button onClick={handleSubmit}>등록</Button>
+          <Button>수정</Button>
+          <Button>삭제</Button>
+        </Flex>
       </Box>
 
       {/* ------------------------ 거래처 검색 하는곳 ------------------------*/}
@@ -189,7 +243,7 @@ function App(props) {
                 </Flex>
               </FormLabel>
               <Input
-                value={companyName}
+                value={companyNumber}
                 onChange={(e) => setCompanyNumber(e.target.value)}
                 w={"230px"}
                 mr={28}
@@ -287,6 +341,7 @@ function App(props) {
                 </Flex>
               </FormLabel>
               <Input
+                readOnly
                 onChange={(e) => setPostalCode(e.target.value)}
                 value={postalCode}
                 w={"230px"}
