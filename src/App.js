@@ -21,11 +21,78 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import * as PropTypes from "prop-types";
+import { useDaumPostcodePopup } from "react-daum-postcode";
 
 function App(props) {
   const emptyRows = new Array(11).fill(null);
   const [value, setValue] = useState("법인");
   const [companyCountry, setCompanyCountry] = useState("국내");
+
+  // ----------------------- 거래처 정보 상태 -----------------------
+  const [companyNumber, setCompanyNumber] = useState(""); // 사업자번호
+  const [abbreviated, setAbbreviated] = useState(""); // 약칭
+  const [companyName, setCompanyName] = useState(""); // 거래처명
+  const [representative, setRepresentative] = useState(""); // 대표자명
+  const [responsiblefor, setResponsiblefor] = useState(""); // 담당자명
+  const [businessType, setBusinessType] = useState(""); // 업태
+  const [items, setItems] = useState(""); // 종목
+  const [postalCode, setPostalCode] = useState(""); // 우편번호
+  const [primaryAddress, setPrimaryAddress] = useState(""); // 기본주소
+  const [detailedAddress, setDetailedAddress] = useState(""); // 상세주소
+  const [phoneNumber, setPhoneNumber] = useState(""); // 전화번호
+  const [faxNumber, setFaxNumber] = useState(""); // 팩스번호
+  const [homepageurl, setHomepageurl] = useState(""); // 홈페이지
+  const [companyType, setCompanyType] = useState(""); // 법인여부
+  const [countryType, setCountryType] = useState(""); // 해외여부
+  const [stopTrading, setStopTrading] = useState(""); // 거래중지
+  const [contractPeriod1, setContractPeriod1] = useState(""); // 계약기간
+  const [contractPeriod2, setContractPeriod2] = useState(""); // 계약기간
+  const [registrationInformation, setRegistrationInformation] = useState(""); // 등록정보
+  const [changeInformation, setChangeInformation] = useState(""); // 변경정보
+
+  // Daum Postcode 스크립트 URL
+  const scriptUrl =
+    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+  // Daum Postcode 팝업을 여는 함수
+  const openPostcodePopup = useDaumPostcodePopup(scriptUrl);
+  // 주소 검색 완료 핸들러
+  const handleComplete = (data) => {
+    let fullAddress = data.roadAddress; // 도로명 주소
+    let extraAddress = "";
+
+    // 도로명 주소에 부가 정보가 있다면 추가합니다.
+    if (data.addressType === "R") {
+      if (data.bname !== "") {
+        extraAddress += data.bname;
+      }
+      if (data.buildingName !== "") {
+        extraAddress += extraAddress
+          ? `, ${data.buildingName}`
+          : data.buildingName;
+      }
+      fullAddress += extraAddress ? ` (${extraAddress})` : "";
+    }
+
+    // 우편번호 설정
+    setPostalCode(data.zonecode);
+
+    // 사용자가 도로명 주소를 선택했는지, 지번 주소를 선택했는지에 따라 기본 주소 상태를 설정합니다.
+    if (data.userSelectedType === "R") {
+      // 사용자가 도로명 주소를 선택한 경우
+      setPrimaryAddress(fullAddress);
+    } else {
+      // 사용자가 지번 주소를 선택한 경우
+      setPrimaryAddress(data.jibunAddress);
+    }
+
+    // 상세 주소는 사용자가 직접 입력하도록 비워둡니다.
+    setDetailedAddress("");
+  };
+
+  // ------------------------------ 주소검색 버튼 클릭시 다음 postcode 팝업 열리게 하는 로직 ------------------------------
+  const handlePostCodeClick = () => {
+    openPostcodePopup({ onComplete: handleComplete });
+  };
 
   return (
     <Box justifyContent="center" minW={"1200px"} p={10}>
@@ -184,8 +251,10 @@ function App(props) {
                   <Text>호</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"230px"} />
-              <Button mr={10}>검색</Button>
+              <Input value={postalCode} w={"230px"} />
+              <Button mr={10} onClick={handlePostCodeClick}>
+                검색
+              </Button>
 
               <FormLabel w={"80px"}>
                 <Flex mt={2} justifyContent="space-between">
@@ -193,7 +262,11 @@ function App(props) {
                   <Text>소</Text>
                 </Flex>
               </FormLabel>
-              <Input w={"250px"} />
+              <Input
+                value={primaryAddress}
+                onChange={(e) => setPrimaryAddress(e.target.value)}
+                w={"350px"}
+              />
             </HStack>
           </FormControl>
 
