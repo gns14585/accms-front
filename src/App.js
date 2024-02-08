@@ -192,6 +192,7 @@ function App(props) {
           거래처 관리 시스템
         </Text>
       </Box>
+
       <Box
         mt={5}
         display={"flex"}
