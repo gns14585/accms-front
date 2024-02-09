@@ -8,6 +8,13 @@ import {
   FormLabel,
   HStack,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Radio,
   RadioGroup,
   Table,
@@ -17,6 +24,7 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -56,6 +64,7 @@ function App(props) {
   const [accountNumber, setAccountNumber] = useState(""); // 계좌번호
 
   const toast = useToast();
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
   // Daum Postcode 스크립트 URL
   const scriptUrl =
@@ -177,6 +186,57 @@ function App(props) {
     setAccountNumber("");
   }
 
+  // ------------------------------ 삭제버튼 클릭시 실행되는 로직 ------------------------------
+  function handleDelete() {
+    axios
+      .delete("/api/account/delete", {
+        data: {
+          custom: {
+            companyNumber: companyNumber,
+            abbreviated: abbreviated,
+            companyName: companyName,
+            representative: representative,
+            responsiblefor: responsiblefor,
+            businessType: businessType,
+            items: items,
+            postalCode: postalCode,
+            primaryAddress: primaryAddress,
+            detailedAddress: detailedAddress,
+            phoneNumber: phoneNumber,
+            faxNumber: faxNumber,
+            homepageurl: homepageurl,
+            companyType: companyType,
+            countryType: countryType,
+            contractPeriod1: contractPeriod1,
+            contractPeriod2: contractPeriod2,
+            registrationInformation: registrationInformation,
+            registrationDateTime: registrationDateTime,
+            changeInformation: changeInformation,
+            changeDateTime: changeDateTime,
+          },
+          account: {
+            offices: offices,
+            bankingInformation: bankingInformation,
+            accountNumber: accountNumber,
+            companyNumber: companyNumber,
+          },
+        },
+      })
+      .then(() => {
+        toast({
+          description: "거래처 정보가 삭제되었습니다.",
+          status: "success",
+        });
+        onClose();
+      })
+      .catch(() => {
+        toast({
+          description: "삭제 중 오류가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
+
   return (
     <Box justifyContent="center" minW={"1200px"} p={10}>
       <Box>
@@ -203,7 +263,7 @@ function App(props) {
           <Button onClick={handleReset}>초기화</Button>
           <Button onClick={handleSubmit}>등록</Button>
           <Button>수정</Button>
-          <Button>삭제</Button>
+          <Button onClick={onOpen}>삭제</Button>
         </Flex>
       </Box>
 
@@ -637,7 +697,25 @@ function App(props) {
         </Box>
       </Flex>
 
-      {/* ------------------------ 거래처 리스트 나오는곳 ------------------------ */}
+      <>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>거래처 삭제</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>삭제 하시겠습니까?</ModalBody>
+
+            <ModalFooter>
+              <Button mr={3} onClick={onClose}>
+                취소
+              </Button>
+              <Button colorScheme={"red"} onClick={handleDelete}>
+                삭제
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </>
     </Box>
   );
 }
