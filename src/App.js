@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -63,8 +63,15 @@ function App(props) {
   const [bankingInformation, setBankingInformation] = useState(""); // 은행정보
   const [accountNumber, setAccountNumber] = useState(""); // 계좌번호
 
+  const [customersList, setCustomersList] = useState([]);
+
   const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
 
   // Daum Postcode 스크립트 URL
   const scriptUrl =
@@ -112,39 +119,74 @@ function App(props) {
 
   // ------------------------------ 등록버튼 클릭시 서버로 전송 로직 ------------------------------
   function handleSubmit() {
+    // axios
+    //   .post("/api/account/add", {
+    //     custom: {
+    //       companyNumber: companyNumber,
+    //       abbreviated: abbreviated,
+    //       companyName: companyName,
+    //       representative: representative,
+    //       responsiblefor: responsiblefor,
+    //       businessType: businessType,
+    //       items: items,
+    //       postalCode: postalCode,
+    //       primaryAddress: primaryAddress,
+    //       detailedAddress: detailedAddress,
+    //       phoneNumber: phoneNumber,
+    //       faxNumber: faxNumber,
+    //       homepageurl: homepageurl,
+    //       companyType: companyType,
+    //       countryType: countryType,
+    //       contractPeriod1: contractPeriod1,
+    //       contractPeriod2: contractPeriod2,
+    //       registrationInformation: registrationInformation,
+    //       registrationDateTime: registrationDateTime,
+    //       changeInformation: changeInformation,
+    //       changeDateTime: changeDateTime,
+    //     },
+    //     account: {
+    //       offices: offices,
+    //       bankingInformation: bankingInformation,
+    //       accountNumber: accountNumber,
+    //       companyNumber: companyNumber,
+    //     },
+    //   })
+    const newCustomer = {
+      custom: {
+        companyNumber: companyNumber,
+        abbreviated: abbreviated,
+        companyName: companyName,
+        representative: representative,
+        responsiblefor: responsiblefor,
+        businessType: businessType,
+        items: items,
+        postalCode: postalCode,
+        primaryAddress: primaryAddress,
+        detailedAddress: detailedAddress,
+        phoneNumber: phoneNumber,
+        faxNumber: faxNumber,
+        homepageurl: homepageurl,
+        companyType: companyType,
+        countryType: countryType,
+        contractPeriod1: contractPeriod1,
+        contractPeriod2: contractPeriod2,
+        registrationInformation: registrationInformation,
+        registrationDateTime: registrationDateTime,
+        changeInformation: changeInformation,
+        changeDateTime: changeDateTime,
+      },
+      account: {
+        offices: offices,
+        bankingInformation: bankingInformation,
+        accountNumber: accountNumber,
+        companyNumber: companyNumber,
+      },
+    };
     axios
-      .post("/api/account/add", {
-        custom: {
-          companyNumber: companyNumber,
-          abbreviated: abbreviated,
-          companyName: companyName,
-          representative: representative,
-          responsiblefor: responsiblefor,
-          businessType: businessType,
-          items: items,
-          postalCode: postalCode,
-          primaryAddress: primaryAddress,
-          detailedAddress: detailedAddress,
-          phoneNumber: phoneNumber,
-          faxNumber: faxNumber,
-          homepageurl: homepageurl,
-          companyType: companyType,
-          countryType: countryType,
-          contractPeriod1: contractPeriod1,
-          contractPeriod2: contractPeriod2,
-          registrationInformation: registrationInformation,
-          registrationDateTime: registrationDateTime,
-          changeInformation: changeInformation,
-          changeDateTime: changeDateTime,
-        },
-        account: {
-          offices: offices,
-          bankingInformation: bankingInformation,
-          accountNumber: accountNumber,
-          companyNumber: companyNumber,
-        },
-      })
+      .post("/api/account/add", newCustomer)
       .then(() => {
+        // 거래처 등록 시 리스트에 실시간으로 보여짐
+        setCustomersList((prevList) => [...prevList, newCustomer.custom]);
         toast({
           description: "거래처 등록 되었습니다.",
           status: "success",
@@ -188,6 +230,9 @@ function App(props) {
 
   // ------------------------------ 삭제버튼 클릭시 실행되는 로직 ------------------------------
   function handleDelete() {
+    // 등록과 동일하게 삭제 시 리스트에서 실시간으로 삭제처리됨
+    const companyNumberToDelete = companyNumber; // 현재 컴포넌트 상태에 있는 companyNumber를 저장
+
     axios
       .delete("/api/account/delete", {
         // data를 넣는 이유
@@ -197,14 +242,19 @@ function App(props) {
         // 4. data를 사용하면 요청본문을 서버로 보냄.
         data: {
           custom: {
-            companyNumber: companyNumber, // PK
+            companyNumber: companyNumberToDelete, // PK
           },
           account: {
-            companyNumber: companyNumber, // FK
+            companyNumber: companyNumberToDelete, // FK
           },
         },
       })
       .then(() => {
+        setCustomersList((prevList) =>
+          prevList.filter(
+            (customer) => customer.companyNumber !== companyNumberToDelete,
+          ),
+        );
         toast({
           description: "거래처 정보가 삭제되었습니다.",
           status: "success",
@@ -218,6 +268,15 @@ function App(props) {
         });
       });
   }
+
+  useEffect(() => {
+    axios
+      .get("/api/account/list")
+      .then((response) => setCustomersList(response.data));
+  }, []);
+
+  // ------------------------------ 수정버튼 클릭시 실행되는 로직 ------------------------------
+  function handleEditSubmit() {}
 
   return (
     <Box justifyContent="center" minW={"1200px"} p={10}>
@@ -244,7 +303,7 @@ function App(props) {
         <Flex gap={4} w={"1375px"} justifyContent={"flex-end"}>
           <Button onClick={handleReset}>초기화</Button>
           <Button onClick={handleSubmit}>등록</Button>
-          <Button>수정</Button>
+          <Button onClick={onEditOpen}>수정</Button>
           <Button onClick={onOpen}>삭제</Button>
         </Flex>
       </Box>
@@ -294,9 +353,24 @@ function App(props) {
                 <Text fontWeight={"bold"}>거래처명</Text>
               </Box>
             </Flex>
-            {/* 데이터 리스트 부분 */}
-            {emptyRows.map((index) => (
-              <Flex h={"49px"} key={index}>
+            {customersList.map((customer, index) => (
+              <Flex h={"49px"} key={customer.companyNumber}>
+                <Box
+                  p={3}
+                  w={"200px"}
+                  borderBottomWidth={"1px"}
+                  borderRightWidth={"1px"}
+                >
+                  <Text>{customer.companyNumber}</Text>
+                </Box>
+                <Box p={3} w={"200px"} borderBottomWidth={"1px"}>
+                  <Text>{customer.companyName}</Text>
+                </Box>
+              </Flex>
+            ))}
+            {/* 필요한 수만큼 빈 행을 추가 */}
+            {[...Array(10 - customersList.length)].map((_, index) => (
+              <Flex h={"49px"} key={`empty-${index}`}>
                 <Box
                   p={3}
                   w={"200px"}
@@ -314,7 +388,7 @@ function App(props) {
         </Box>
 
         {/* ------------------------ 거래처 CRUD 하는곳 ------------------------ */}
-        <Box p={2} ml={5} w={"950px"} h={"850px"} borderWidth={"2px"}>
+        <Box p={2} ml={5} w={"950px"} h={"800px"} borderWidth={"2px"}>
           <FormControl mt={4}>
             <HStack>
               <FormLabel w={"80px"}>
@@ -559,23 +633,6 @@ function App(props) {
             </HStack>
           </FormControl>
 
-          {/*<FormControl mt={4}>*/}
-          {/*  <HStack>*/}
-          {/*    <FormLabel w={"80px"}>*/}
-          {/*      <Flex justifyContent={"space-between"}>*/}
-          {/*        <Text>거</Text> <Text>래</Text> <Text>중</Text>*/}
-          {/*        <Text>지</Text>*/}
-          {/*      </Flex>*/}
-          {/*    </FormLabel>*/}
-          {/*    <Checkbox*/}
-          {/*      value={stopTrading}*/}
-          {/*      onChange={(e) => setStopTrading(e.target.value)}*/}
-          {/*      size={"lg"}*/}
-          {/*      bottom={1}*/}
-          {/*    />*/}
-          {/*  </HStack>*/}
-          {/*</FormControl>*/}
-
           <FormControl mt={4}>
             <HStack>
               <FormLabel w={"80px"}>
@@ -679,25 +736,43 @@ function App(props) {
         </Box>
       </Flex>
 
-      <>
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>거래처 삭제</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>삭제 하시겠습니까?</ModalBody>
+      {/* -------------------------- 삭제 모달 -------------------------- */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>거래처 삭제</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>삭제 하시겠습니까?</ModalBody>
 
-            <ModalFooter>
-              <Button mr={3} onClick={onClose}>
-                취소
-              </Button>
-              <Button colorScheme={"red"} onClick={handleDelete}>
-                삭제
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      </>
+          <ModalFooter>
+            <Button mr={3} onClick={onClose}>
+              취소
+            </Button>
+            <Button colorScheme={"red"} onClick={handleDelete}>
+              삭제
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* -------------------------- 수정 모달 -------------------------- */}
+      <Modal isOpen={isEditOpen} onClose={onEditClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>거래처 수정</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>수정 하시겠습니까?</ModalBody>
+
+          <ModalFooter>
+            <Button mr={3} onClick={onEditClose}>
+              취소
+            </Button>
+            <Button colorScheme={"blue"} onClick={handleEditSubmit}>
+              수정
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
