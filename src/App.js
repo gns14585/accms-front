@@ -190,35 +190,17 @@ function App(props) {
   function handleDelete() {
     axios
       .delete("/api/account/delete", {
+        // data를 넣는 이유
+        // 1. axios.delete 메서드는 보통 url의 정보를 사용함 ex) "/api/account/delete" + account_id (게시글삭제)
+        // 2. 또는 로그인 한 아이디 session의 정보 (회원탈퇴)
+        // 3. 근데 url의 정보가 없는경우 본문을 통해 전달해야함.
+        // 4. data를 사용하면 요청본문을 서버로 보냄.
         data: {
           custom: {
-            companyNumber: companyNumber,
-            abbreviated: abbreviated,
-            companyName: companyName,
-            representative: representative,
-            responsiblefor: responsiblefor,
-            businessType: businessType,
-            items: items,
-            postalCode: postalCode,
-            primaryAddress: primaryAddress,
-            detailedAddress: detailedAddress,
-            phoneNumber: phoneNumber,
-            faxNumber: faxNumber,
-            homepageurl: homepageurl,
-            companyType: companyType,
-            countryType: countryType,
-            contractPeriod1: contractPeriod1,
-            contractPeriod2: contractPeriod2,
-            registrationInformation: registrationInformation,
-            registrationDateTime: registrationDateTime,
-            changeInformation: changeInformation,
-            changeDateTime: changeDateTime,
+            companyNumber: companyNumber, // PK
           },
           account: {
-            offices: offices,
-            bankingInformation: bankingInformation,
-            accountNumber: accountNumber,
-            companyNumber: companyNumber,
+            companyNumber: companyNumber, // FK
           },
         },
       })
