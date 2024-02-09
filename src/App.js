@@ -64,6 +64,7 @@ function App(props) {
   const [accountNumber, setAccountNumber] = useState(""); // 계좌번호
 
   const [customersList, setCustomersList] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -186,7 +187,7 @@ function App(props) {
       .post("/api/account/add", newCustomer)
       .then(() => {
         // 거래처 등록 시 리스트에 실시간으로 보여짐
-        setCustomersList((prevList) => [...prevList, newCustomer.custom]);
+        setCustomersList((list) => [...list, newCustomer.custom]);
         toast({
           description: "거래처 등록 되었습니다.",
           status: "success",
@@ -231,7 +232,8 @@ function App(props) {
   // ------------------------------ 삭제버튼 클릭시 실행되는 로직 ------------------------------
   function handleDelete() {
     // 등록과 동일하게 삭제 시 리스트에서 실시간으로 삭제처리됨
-    const companyNumberToDelete = companyNumber; // 현재 컴포넌트 상태에 있는 companyNumber를 저장
+    // 현재 컴포넌트 상태에 있는 companyNumber를 저장
+    const companyNumberToDelete = companyNumber;
 
     axios
       .delete("/api/account/delete", {
@@ -250,8 +252,8 @@ function App(props) {
         },
       })
       .then(() => {
-        setCustomersList((prevList) =>
-          prevList.filter(
+        setCustomersList((list) =>
+          list.filter(
             (customer) => customer.companyNumber !== companyNumberToDelete,
           ),
         );
@@ -277,6 +279,43 @@ function App(props) {
 
   // ------------------------------ 수정버튼 클릭시 실행되는 로직 ------------------------------
   function handleEditSubmit() {}
+
+  // ------------------------------ 글자수가 특정개수 이상일때 자르기 ------------------------------
+  const truncateText = (str, num) => {
+    if (str && str.length > num) {
+      return str.slice(0, num) + "...";
+    }
+    return str;
+  };
+
+  const handleCustomerClick = (customer) => {
+    setSelectedCustomer(customer);
+    // 거래처를 클릭하면 해당 거래처의 정보를 입력 필드에 표시
+    setCompanyNumber(customer.custom.companyNumber || "");
+    setAbbreviated(customer.custom.abbreviated || "");
+    setCompanyName(customer.custom.companyName || "");
+    setRepresentative(customer.custom.representative || "");
+    setResponsiblefor(customer.custom.responsiblefor || "");
+    setBusinessType(customer.custom.businessType || "");
+    setItems(customer.custom.items || "");
+    setPostalCode(customer.custom.postalCode || "");
+    setPrimaryAddress(customer.custom.primaryAddress || "");
+    setDetailedAddress(customer.custom.detailedAddress || "");
+    setPhoneNumber(customer.custom.phoneNumber || "");
+    setFaxNumber(customer.custom.faxNumber || "");
+    setHomepageurl(customer.custom.homepageurl || "");
+    setCompanyType(customer.custom.companyType || "법인");
+    setCountryType(customer.custom.countryType || "국내");
+    setContractPeriod1(customer.custom.contractPeriod1 || "");
+    setContractPeriod2(customer.custom.contractPeriod2 || "");
+    setRegistrationInformation(customer.custom.registrationInformation || "");
+    setRegistrationDateTime(customer.custom.registrationDateTime || "");
+    setChangeInformation(customer.custom.changeInformation || "");
+    setChangeDateTime(customer.custom.changeDateTime || "");
+    setOffices(customer.account.offices || "");
+    setBankingInformation(customer.account.bankingInformation || "");
+    setAccountNumber(customer.account.accountNumber || "");
+  };
 
   return (
     <Box justifyContent="center" minW={"1200px"} p={10}>
@@ -334,6 +373,7 @@ function App(props) {
             </Button>
           </Box>
           <Table
+            _hover={{ cursor: "pointer" }}
             align="stretch"
             borderWidth={"1px"}
             w={"400px"}
@@ -354,22 +394,26 @@ function App(props) {
               </Box>
             </Flex>
             {customersList.map((customer, index) => (
-              <Flex h={"49px"} key={customer.companyNumber}>
+              <Flex
+                h={"49px"}
+                key={customer.companyNumber}
+                onClick={() => handleCustomerClick(customer)}
+              >
                 <Box
                   p={3}
                   w={"200px"}
                   borderBottomWidth={"1px"}
                   borderRightWidth={"1px"}
                 >
-                  <Text>{customer.companyNumber}</Text>
+                  <Text>{customer.custom.companyNumber}</Text>
                 </Box>
                 <Box p={3} w={"200px"} borderBottomWidth={"1px"}>
-                  <Text>{customer.companyName}</Text>
+                  <Text>{truncateText(customer.custom.companyName, 10)}</Text>
                 </Box>
               </Flex>
             ))}
             {/* 필요한 수만큼 빈 행을 추가 */}
-            {[...Array(10 - customersList.length)].map((_, index) => (
+            {[...Array(10 - customersList.length)].map((index) => (
               <Flex h={"49px"} key={`empty-${index}`}>
                 <Box
                   p={3}
@@ -410,6 +454,7 @@ function App(props) {
                 </Flex>
               </FormLabel>
               <Input
+                // value={abbreviated}
                 value={abbreviated}
                 onChange={(e) => setAbbreviated(e.target.value)}
                 w={"250px"}
