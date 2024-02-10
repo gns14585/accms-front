@@ -58,6 +58,7 @@ function App(props) {
   const [registrationDateTime, setRegistrationDateTime] = useState(""); // 등록날짜
   const [changeInformation, setChangeInformation] = useState(""); // 변경정보
   const [changeDateTime, setChangeDateTime] = useState(""); // 변경날짜
+  const [regTime, setRegTime] = useState("");
 
   const [offices, setOffices] = useState(""); // 사무소
   const [bankingInformation, setBankingInformation] = useState(""); // 은행정보
@@ -120,38 +121,6 @@ function App(props) {
 
   // ------------------------------ 등록버튼 클릭시 서버로 전송 로직 ------------------------------
   function handleSubmit() {
-    // axios
-    //   .post("/api/account/add", {
-    //     custom: {
-    //       companyNumber: companyNumber,
-    //       abbreviated: abbreviated,
-    //       companyName: companyName,
-    //       representative: representative,
-    //       responsiblefor: responsiblefor,
-    //       businessType: businessType,
-    //       items: items,
-    //       postalCode: postalCode,
-    //       primaryAddress: primaryAddress,
-    //       detailedAddress: detailedAddress,
-    //       phoneNumber: phoneNumber,
-    //       faxNumber: faxNumber,
-    //       homepageurl: homepageurl,
-    //       companyType: companyType,
-    //       countryType: countryType,
-    //       contractPeriod1: contractPeriod1,
-    //       contractPeriod2: contractPeriod2,
-    //       registrationInformation: registrationInformation,
-    //       registrationDateTime: registrationDateTime,
-    //       changeInformation: changeInformation,
-    //       changeDateTime: changeDateTime,
-    //     },
-    //     account: {
-    //       offices: offices,
-    //       bankingInformation: bankingInformation,
-    //       accountNumber: accountNumber,
-    //       companyNumber: companyNumber,
-    //     },
-    //   })
     const newCustomer = {
       custom: {
         companyNumber: companyNumber,
@@ -185,9 +154,15 @@ function App(props) {
     };
     axios
       .post("/api/account/add", newCustomer)
-      .then(() => {
-        // 거래처 등록 시 리스트에 실시간으로 보여짐
-        setCustomersList((list) => [...list, newCustomer.custom]);
+      .then((response) => {
+        // 서버로부터의 응답이 올바른지 확인하고, 존재하지 않는 경우 newCustomer.custom을 사용
+        const savedCustomer =
+          response.data && response.data.custom
+            ? response.data.custom
+            : newCustomer.custom;
+
+        // 리스트에 실시간으로 추가
+        setCustomersList((prevList) => [...prevList, savedCustomer]);
         toast({
           description: "거래처 등록 되었습니다.",
           status: "success",
@@ -254,7 +229,8 @@ function App(props) {
       .then(() => {
         setCustomersList((list) =>
           list.filter(
-            (customer) => customer.companyNumber !== companyNumberToDelete,
+            (customer) =>
+              customer.custom.companyNumber !== companyNumberToDelete,
           ),
         );
         toast({
@@ -278,7 +254,93 @@ function App(props) {
   }, []);
 
   // ------------------------------ 수정버튼 클릭시 실행되는 로직 ------------------------------
-  function handleEditSubmit() {}
+  function handleEditSubmit() {
+    axios
+      .put("/api/account/edit", {
+        custom: {
+          companyNumber: companyNumber,
+          abbreviated: abbreviated,
+          companyName: companyName,
+          representative: representative,
+          responsiblefor: responsiblefor,
+          businessType: businessType,
+          items: items,
+          postalCode: postalCode,
+          primaryAddress: primaryAddress,
+          detailedAddress: detailedAddress,
+          phoneNumber: phoneNumber,
+          faxNumber: faxNumber,
+          homepageurl: homepageurl,
+          companyType: companyType,
+          countryType: countryType,
+          contractPeriod1: contractPeriod1,
+          contractPeriod2: contractPeriod2,
+          registrationInformation: registrationInformation,
+          registrationDateTime: registrationDateTime,
+          changeInformation: changeInformation,
+          changeDateTime: changeDateTime,
+        },
+        account: {
+          offices: offices,
+          bankingInformation: bankingInformation,
+          accountNumber: accountNumber,
+          companyNumber: companyNumber,
+        },
+      })
+      .then(() => {
+        onEditClose();
+        toast({
+          description: "수정되었습니다.",
+          status: "success",
+        });
+        // 수정버튼 클릭했을때 거래처 리스트에 실시간으로 변경내역 저장 (새로고침 안해도 변경내역 바로 볼 수 있음)
+        setCustomersList((prevList) =>
+          prevList.map((customer) => {
+            if (customer.custom.companyNumber === companyNumber) {
+              return {
+                ...customer,
+                custom: {
+                  ...customer.custom,
+                  abbreviated,
+                  companyName,
+                  representative,
+                  responsiblefor,
+                  businessType,
+                  items,
+                  postalCode,
+                  primaryAddress,
+                  detailedAddress,
+                  phoneNumber,
+                  faxNumber,
+                  homepageurl,
+                  companyType,
+                  countryType,
+                  contractPeriod1,
+                  contractPeriod2,
+                  registrationInformation,
+                  registrationDateTime,
+                  changeInformation,
+                  changeDateTime,
+                },
+                account: {
+                  ...customer.account,
+                  offices,
+                  bankingInformation,
+                  accountNumber,
+                },
+              };
+            }
+            return customer;
+          }),
+        );
+      })
+      .catch(() => {
+        toast({
+          description: "수정 중 오류가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
 
   // ------------------------------ 글자수가 특정개수 이상일때 자르기 ------------------------------
   const truncateText = (str, num) => {
@@ -393,25 +455,31 @@ function App(props) {
                 <Text fontWeight={"bold"}>거래처명</Text>
               </Box>
             </Flex>
-            {customersList.map((customer, index) => (
-              <Flex
-                h={"49px"}
-                key={customer.companyNumber}
-                onClick={() => handleCustomerClick(customer)}
-              >
-                <Box
-                  p={3}
-                  w={"200px"}
-                  borderBottomWidth={"1px"}
-                  borderRightWidth={"1px"}
-                >
-                  <Text>{customer.custom.companyNumber}</Text>
-                </Box>
-                <Box p={3} w={"200px"} borderBottomWidth={"1px"}>
-                  <Text>{truncateText(customer.custom.companyName, 10)}</Text>
-                </Box>
-              </Flex>
-            ))}
+            {customersList.map(
+              (customer, index) =>
+                customer &&
+                customer.custom && (
+                  <Flex
+                    h={"49px"}
+                    key={customer.custom.companyNumber}
+                    onClick={() => handleCustomerClick(customer)}
+                  >
+                    <Box
+                      p={3}
+                      w={"200px"}
+                      borderBottomWidth={"1px"}
+                      borderRightWidth={"1px"}
+                    >
+                      <Text>{customer.custom.companyNumber}</Text>
+                    </Box>
+                    <Box p={3} w={"200px"} borderBottomWidth={"1px"}>
+                      <Text>
+                        {truncateText(customer.custom.companyName, 10)}
+                      </Text>
+                    </Box>
+                  </Flex>
+                ),
+            )}
             {/* 필요한 수만큼 빈 행을 추가 */}
             {[...Array(10 - customersList.length)].map((index) => (
               <Flex h={"49px"} key={`empty-${index}`}>
