@@ -122,35 +122,30 @@ function App(props) {
   // ------------------------------ 등록버튼 클릭시 서버로 전송 로직 ------------------------------
   function handleSubmit() {
     const newCustomer = {
-      custom: {
-        companyNumber: companyNumber,
-        abbreviated: abbreviated,
-        companyName: companyName,
-        representative: representative,
-        responsiblefor: responsiblefor,
-        businessType: businessType,
-        items: items,
-        postalCode: postalCode,
-        primaryAddress: primaryAddress,
-        detailedAddress: detailedAddress,
-        phoneNumber: phoneNumber,
-        faxNumber: faxNumber,
-        homepageurl: homepageurl,
-        companyType: companyType,
-        countryType: countryType,
-        contractPeriod1: contractPeriod1,
-        contractPeriod2: contractPeriod2,
-        registrationInformation: registrationInformation,
-        registrationDateTime: registrationDateTime,
-        changeInformation: changeInformation,
-        changeDateTime: changeDateTime,
-      },
-      account: {
-        offices: offices,
-        bankingInformation: bankingInformation,
-        accountNumber: accountNumber,
-        companyNumber: companyNumber,
-      },
+      companyNumber: companyNumber,
+      abbreviated: abbreviated,
+      companyName: companyName,
+      representative: representative,
+      responsiblefor: responsiblefor,
+      businessType: businessType,
+      items: items,
+      postalCode: postalCode,
+      primaryAddress: primaryAddress,
+      detailedAddress: detailedAddress,
+      phoneNumber: phoneNumber,
+      faxNumber: faxNumber,
+      homepageurl: homepageurl,
+      companyType: companyType,
+      countryType: countryType,
+      contractPeriod1: contractPeriod1,
+      contractPeriod2: contractPeriod2,
+      registrationInformation: registrationInformation,
+      registrationDateTime: registrationDateTime,
+      changeInformation: changeInformation,
+      changeDateTime: changeDateTime,
+      offices: offices,
+      bankingInformation: bankingInformation,
+      accountNumber: accountNumber,
     };
     axios
       .post("/api/account/add", newCustomer)
@@ -213,19 +208,13 @@ function App(props) {
         // 3. 근데 url의 정보가 없는경우 본문을 통해 전달해야함.
         // 4. data를 사용하면 요청본문을 서버로 보냄.
         data: {
-          custom: {
-            companyNumber: companyNumberToDelete, // PK
-          },
-          account: {
-            companyNumber: companyNumberToDelete, // FK
-          },
+          companyNumber: companyNumberToDelete, // PK
         },
       })
       .then(() => {
         setCustomersList((list) =>
           list.filter(
-            (customer) =>
-              customer.custom.companyNumber !== companyNumberToDelete,
+            (customer) => customer.companyNumber !== companyNumberToDelete,
           ),
         );
         toast({
@@ -252,35 +241,31 @@ function App(props) {
   function handleEditSubmit() {
     axios
       .put("/api/account/edit", {
-        custom: {
-          companyNumber: companyNumber,
-          abbreviated: abbreviated,
-          companyName: companyName,
-          representative: representative,
-          responsiblefor: responsiblefor,
-          businessType: businessType,
-          items: items,
-          postalCode: postalCode,
-          primaryAddress: primaryAddress,
-          detailedAddress: detailedAddress,
-          phoneNumber: phoneNumber,
-          faxNumber: faxNumber,
-          homepageurl: homepageurl,
-          companyType: companyType,
-          countryType: countryType,
-          contractPeriod1: contractPeriod1,
-          contractPeriod2: contractPeriod2,
-          registrationInformation: registrationInformation,
-          registrationDateTime: registrationDateTime,
-          changeInformation: changeInformation,
-          changeDateTime: changeDateTime,
-        },
-        account: {
-          offices: offices,
-          bankingInformation: bankingInformation,
-          accountNumber: accountNumber,
-          companyNumber: companyNumber,
-        },
+        companyNumber: companyNumber,
+        abbreviated: abbreviated,
+        companyName: companyName,
+        representative: representative,
+        responsiblefor: responsiblefor,
+        businessType: businessType,
+        items: items,
+        postalCode: postalCode,
+        primaryAddress: primaryAddress,
+        detailedAddress: detailedAddress,
+        phoneNumber: phoneNumber,
+        faxNumber: faxNumber,
+        homepageurl: homepageurl,
+        companyType: companyType,
+        countryType: countryType,
+        contractPeriod1: contractPeriod1,
+        contractPeriod2: contractPeriod2,
+        registrationInformation: registrationInformation,
+        registrationDateTime: registrationDateTime,
+        changeInformation: changeInformation,
+        changeDateTime: changeDateTime,
+
+        offices: offices,
+        bankingInformation: bankingInformation,
+        accountNumber: accountNumber,
       })
       .then(() => {
         onEditClose();
@@ -291,38 +276,32 @@ function App(props) {
         // 수정버튼 클릭했을때 거래처 리스트에 실시간으로 변경내역 저장 (새로고침 안해도 변경내역 바로 볼 수 있음)
         setCustomersList((prevList) =>
           prevList.map((customer) => {
-            if (customer.custom.companyNumber === companyNumber) {
+            if (customer.companyNumber === companyNumber) {
               return {
                 ...customer,
-                custom: {
-                  ...customer.custom,
-                  abbreviated,
-                  companyName,
-                  representative,
-                  responsiblefor,
-                  businessType,
-                  items,
-                  postalCode,
-                  primaryAddress,
-                  detailedAddress,
-                  phoneNumber,
-                  faxNumber,
-                  homepageurl,
-                  companyType,
-                  countryType,
-                  contractPeriod1,
-                  contractPeriod2,
-                  registrationInformation,
-                  registrationDateTime,
-                  changeInformation,
-                  changeDateTime,
-                },
-                account: {
-                  ...customer.account,
-                  offices,
-                  bankingInformation,
-                  accountNumber,
-                },
+                abbreviated,
+                companyName,
+                representative,
+                responsiblefor,
+                businessType,
+                items,
+                postalCode,
+                primaryAddress,
+                detailedAddress,
+                phoneNumber,
+                faxNumber,
+                homepageurl,
+                companyType,
+                countryType,
+                contractPeriod1,
+                contractPeriod2,
+                registrationInformation,
+                registrationDateTime,
+                changeInformation,
+                changeDateTime,
+                offices,
+                bankingInformation,
+                accountNumber,
               };
             }
             return customer;
@@ -348,30 +327,30 @@ function App(props) {
   const handleCustomerClick = (customer) => {
     setSelectedCustomer(customer);
     // 거래처를 클릭하면 해당 거래처의 정보를 입력 필드에 표시
-    setCompanyNumber(customer.custom.companyNumber || "");
-    setAbbreviated(customer.custom.abbreviated || "");
-    setCompanyName(customer.custom.companyName || "");
-    setRepresentative(customer.custom.representative || "");
-    setResponsiblefor(customer.custom.responsiblefor || "");
-    setBusinessType(customer.custom.businessType || "");
-    setItems(customer.custom.items || "");
-    setPostalCode(customer.custom.postalCode || "");
-    setPrimaryAddress(customer.custom.primaryAddress || "");
-    setDetailedAddress(customer.custom.detailedAddress || "");
-    setPhoneNumber(customer.custom.phoneNumber || "");
-    setFaxNumber(customer.custom.faxNumber || "");
-    setHomepageurl(customer.custom.homepageurl || "");
-    setCompanyType(customer.custom.companyType || "법인");
-    setCountryType(customer.custom.countryType || "국내");
-    setContractPeriod1(customer.custom.contractPeriod1 || "");
-    setContractPeriod2(customer.custom.contractPeriod2 || "");
-    setRegistrationInformation(customer.custom.registrationInformation || "");
-    setRegistrationDateTime(customer.custom.registrationDateTime || "");
-    setChangeInformation(customer.custom.changeInformation || "");
-    setChangeDateTime(customer.custom.changeDateTime || "");
-    setOffices(customer.account.offices || "");
-    setBankingInformation(customer.account.bankingInformation || "");
-    setAccountNumber(customer.account.accountNumber || "");
+    setCompanyNumber(customer.companyNumber || "");
+    setAbbreviated(customer.abbreviated || "");
+    setCompanyName(customer.companyName || "");
+    setRepresentative(customer.representative || "");
+    setResponsiblefor(customer.responsiblefor || "");
+    setBusinessType(customer.businessType || "");
+    setItems(customer.items || "");
+    setPostalCode(customer.postalCode || "");
+    setPrimaryAddress(customer.primaryAddress || "");
+    setDetailedAddress(customer.detailedAddress || "");
+    setPhoneNumber(customer.phoneNumber || "");
+    setFaxNumber(customer.faxNumber || "");
+    setHomepageurl(customer.homepageurl || "");
+    setCompanyType(customer.companyType || "법인");
+    setCountryType(customer.countryType || "국내");
+    setContractPeriod1(customer.contractPeriod1 || "");
+    setContractPeriod2(customer.contractPeriod2 || "");
+    setRegistrationInformation(customer.registrationInformation || "");
+    setRegistrationDateTime(customer.registrationDateTime || "");
+    setChangeInformation(customer.changeInformation || "");
+    setChangeDateTime(customer.changeDateTime || "");
+    setOffices(customer.offices || "");
+    setBankingInformation(customer.bankingInformation || "");
+    setAccountNumber(customer.accountNumber || "");
   };
 
   return (
@@ -452,11 +431,10 @@ function App(props) {
             </Flex>
             {customersList.map(
               (customer) =>
-                customer &&
-                customer.custom && (
+                customer && (
                   <Flex
                     h={"49px"}
-                    key={customer.custom.companyNumber}
+                    key={customer.companyNumber}
                     onClick={() => handleCustomerClick(customer)}
                   >
                     <Box
@@ -465,12 +443,10 @@ function App(props) {
                       borderBottomWidth={"1px"}
                       borderRightWidth={"1px"}
                     >
-                      <Text>{customer.custom.companyNumber}</Text>
+                      <Text>{customer.companyNumber}</Text>
                     </Box>
                     <Box p={3} w={"200px"} borderBottomWidth={"1px"}>
-                      <Text>
-                        {truncateText(customer.custom.companyName, 10)}
-                      </Text>
+                      <Text>{truncateText(customer.companyName, 10)}</Text>
                     </Box>
                   </Flex>
                 ),
