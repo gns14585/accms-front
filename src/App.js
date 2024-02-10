@@ -84,8 +84,7 @@ function App(props) {
   const handleComplete = (data) => {
     let fullAddress = data.roadAddress; // 도로명 주소
     let extraAddress = "";
-
-    // 도로명 주소에 부가 정보가 있다면 추가합니다.
+    // 도로명 주소에 부가 정보가 있다면 추가
     if (data.addressType === "R") {
       if (data.bname !== "") {
         extraAddress += data.bname;
@@ -97,11 +96,9 @@ function App(props) {
       }
       fullAddress += extraAddress ? ` (${extraAddress})` : "";
     }
-
     // 우편번호 설정
     setPostalCode(data.zonecode);
-
-    // 사용자가 도로명 주소를 선택했는지, 지번 주소를 선택했는지에 따라 기본 주소 상태를 설정합니다.
+    // 사용자가 도로명 주소를 선택했는지, 지번 주소를 선택했는지에 따라 기본 주소 상태를 설정
     if (data.userSelectedType === "R") {
       // 사용자가 도로명 주소를 선택한 경우
       setPrimaryAddress(fullAddress);
@@ -109,7 +106,6 @@ function App(props) {
       // 사용자가 지번 주소를 선택한 경우
       setPrimaryAddress(data.jibunAddress);
     }
-
     // 상세 주소는 사용자가 직접 입력하도록 비워둡니다.
     setDetailedAddress("");
   };
@@ -149,7 +145,7 @@ function App(props) {
     };
     axios
       .post("/api/account/add", newCustomer)
-      .then((response) => {
+      .then(() => {
         // 실시간으로 리스트 업데이트
         // 요청 성공 시, 새 거래처를 리스트의 맨 위에 추가
         setCustomersList((prevList) => [newCustomer, ...prevList]);
