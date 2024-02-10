@@ -156,8 +156,8 @@ function App(props) {
       .post("/api/account/add", newCustomer)
       .then((response) => {
         // 실시간으로 리스트 업데이트
-        setCustomersList((prevList) => [...prevList, response.data]);
-
+        // 요청 성공 시, 새 거래처를 리스트의 맨 위에 추가
+        setCustomersList((prevList) => [newCustomer, ...prevList]);
         toast({
           description: "거래처 등록 되었습니다.",
           status: "success",
