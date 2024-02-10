@@ -155,14 +155,9 @@ function App(props) {
     axios
       .post("/api/account/add", newCustomer)
       .then((response) => {
-        // 서버로부터의 응답이 올바른지 확인하고, 존재하지 않는 경우 newCustomer.custom을 사용
-        const savedCustomer =
-          response.data && response.data.custom
-            ? response.data.custom
-            : newCustomer.custom;
+        // 실시간으로 리스트 업데이트
+        setCustomersList((prevList) => [...prevList, response.data]);
 
-        // 리스트에 실시간으로 추가
-        setCustomersList((prevList) => [...prevList, savedCustomer]);
         toast({
           description: "거래처 등록 되었습니다.",
           status: "success",
@@ -434,7 +429,7 @@ function App(props) {
               조회
             </Button>
           </Box>
-          <Table
+          <Box
             _hover={{ cursor: "pointer" }}
             align="stretch"
             borderWidth={"1px"}
@@ -461,7 +456,7 @@ function App(props) {
                 customer.custom && (
                   <Flex
                     h={"49px"}
-                    key={customer.custom.companyNumber}
+                    key={index}
                     onClick={() => handleCustomerClick(customer)}
                   >
                     <Box
@@ -481,8 +476,8 @@ function App(props) {
                 ),
             )}
             {/* 필요한 수만큼 빈 행을 추가 */}
-            {[...Array(10 - customersList.length)].map((index) => (
-              <Flex h={"49px"} key={`empty-${index}`}>
+            {[...Array(10 - customersList.length)].map((_, index) => (
+              <Flex h={"49px"} key={index}>
                 <Box
                   p={3}
                   w={"200px"}
@@ -496,7 +491,7 @@ function App(props) {
                 </Box>
               </Flex>
             ))}
-          </Table>
+          </Box>
         </Box>
 
         {/* ------------------------ 거래처 CRUD 하는곳 ------------------------ */}
