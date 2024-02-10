@@ -51,14 +51,12 @@ function App(props) {
   const [homepageurl, setHomepageurl] = useState(""); // 홈페이지
   const [companyType, setCompanyType] = useState("법인"); // 법인여부
   const [countryType, setCountryType] = useState("국내"); // 해외여부
-  // const [stopTrading, setStopTrading] = useState(""); // 거래중지
   const [contractPeriod1, setContractPeriod1] = useState(""); // 계약기간1
   const [contractPeriod2, setContractPeriod2] = useState(""); // 계약기간2
   const [registrationInformation, setRegistrationInformation] = useState(""); // 등록정보
   const [registrationDateTime, setRegistrationDateTime] = useState(""); // 등록날짜
   const [changeInformation, setChangeInformation] = useState(""); // 변경정보
   const [changeDateTime, setChangeDateTime] = useState(""); // 변경날짜
-  const [regTime, setRegTime] = useState("");
 
   const [offices, setOffices] = useState(""); // 사무소
   const [bankingInformation, setBankingInformation] = useState(""); // 은행정보
@@ -78,8 +76,10 @@ function App(props) {
   // Daum Postcode 스크립트 URL
   const scriptUrl =
     "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+
   // Daum Postcode 팝업을 여는 함수
   const openPostcodePopup = useDaumPostcodePopup(scriptUrl);
+
   // 주소 검색 완료 핸들러
   const handleComplete = (data) => {
     let fullAddress = data.roadAddress; // 도로명 주소
@@ -404,7 +404,7 @@ function App(props) {
         </Flex>
       </Box>
 
-      {/* ------------------------ 거래처 검색 하는곳 ------------------------*/}
+      {/* ------------------------ 거래처 검색 하는곳 ------------------------@@*/}
       <Flex justifyContent={"center"} mt={5} alignItems={"start"}>
         <Box borderWidth={"2px"} maxW={"404px"}>
           <Box p={3}>
@@ -451,12 +451,12 @@ function App(props) {
               </Box>
             </Flex>
             {customersList.map(
-              (customer, index) =>
+              (customer) =>
                 customer &&
                 customer.custom && (
                   <Flex
                     h={"49px"}
-                    key={index}
+                    key={customer.custom.companyNumber}
                     onClick={() => handleCustomerClick(customer)}
                   >
                     <Box
