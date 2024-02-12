@@ -17,6 +17,7 @@ import {
   ModalOverlay,
   Radio,
   RadioGroup,
+  Spinner,
   Table,
   Tbody,
   Td,
@@ -31,10 +32,9 @@ import {
 import axios from "axios";
 import * as PropTypes from "prop-types";
 import { useDaumPostcodePopup } from "react-daum-postcode";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function App(props) {
-  const emptyRows = new Array(11).fill(null);
-
   // ----------------------- 거래처 정보 상태 -----------------------
   const [companyNumber, setCompanyNumber] = useState(""); // 사업자번호
   const [abbreviated, setAbbreviated] = useState(""); // 약칭
@@ -62,8 +62,11 @@ function App(props) {
   const [bankingInformation, setBankingInformation] = useState(""); // 은행정보
   const [accountNumber, setAccountNumber] = useState(""); // 계좌번호
 
-  const [customersList, setCustomersList] = useState([]);
+  const [customersList, setCustomersList] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const navigate = useNavigate();
+
+  const [params] = useSearchParams();
 
   const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -114,6 +117,18 @@ function App(props) {
   const handlePostCodeClick = () => {
     openPostcodePopup({ onComplete: handleComplete });
   };
+
+  // ------------------------------ 거래처 리스트 가져오기 ------------------------------
+  useEffect(() => {
+    const queryString = params.toString();
+    axios
+      .get("/api/account/list?" + queryString)
+      .then((response) => setCustomersList(response.data));
+  }, [params]);
+
+  if (customersList === null) {
+    return <Spinner />;
+  }
 
   // ------------------------------ 등록버튼 클릭시 서버로 전송 로직 ------------------------------
   function handleSubmit() {
@@ -226,12 +241,6 @@ function App(props) {
         });
       });
   }
-
-  useEffect(() => {
-    axios
-      .get("/api/account/list")
-      .then((response) => setCustomersList(response.data));
-  }, []);
 
   // ------------------------------ 수정버튼 클릭시 실행되는 로직 ------------------------------
   function handleEditSubmit() {
@@ -447,22 +456,22 @@ function App(props) {
                   </Flex>
                 ),
             )}
-            {/* 필요한 수만큼 빈 행을 추가 */}
-            {[...Array(10 - customersList.length)].map((_, index) => (
-              <Flex h={"49px"} key={index}>
-                <Box
-                  p={3}
-                  w={"200px"}
-                  borderBottomWidth={"1px"}
-                  borderRightWidth={"1px"}
-                >
-                  <Text>&nbsp;</Text>
-                </Box>
-                <Box p={3} w={"200px"} borderBottomWidth={"1px"}>
-                  <Text>&nbsp;</Text>
-                </Box>
-              </Flex>
-            ))}
+            {/*/!* 필요한 수만큼 빈 행을 추가 *!/*/}
+            {/*{[...Array(10 - customersList.length)].map((_, index) => (*/}
+            {/*  <Flex h={"49px"} key={index}>*/}
+            {/*    <Box*/}
+            {/*      p={3}*/}
+            {/*      w={"200px"}*/}
+            {/*      borderBottomWidth={"1px"}*/}
+            {/*      borderRightWidth={"1px"}*/}
+            {/*    >*/}
+            {/*      <Text>&nbsp;</Text>*/}
+            {/*    </Box>*/}
+            {/*    <Box p={3} w={"200px"} borderBottomWidth={"1px"}>*/}
+            {/*      <Text>&nbsp;</Text>*/}
+            {/*    </Box>*/}
+            {/*  </Flex>*/}
+            {/*))}*/}
           </Box>
         </Box>
 
@@ -853,6 +862,14 @@ function App(props) {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <Box>
+        <Button onClick={() => navigate("/?p=1")}>1</Button>
+        <Button onClick={() => navigate("/?p=2")}>2</Button>
+        <Button onClick={() => navigate("/?p=3")}>3</Button>
+        <Button onClick={() => navigate("/?p=4")}>4</Button>
+        <Button onClick={() => navigate("/?p=5")}>5</Button>
+      </Box>
     </Box>
   );
 }
