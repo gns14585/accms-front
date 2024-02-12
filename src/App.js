@@ -30,9 +30,53 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
-import * as PropTypes from "prop-types";
 import { useDaumPostcodePopup } from "react-daum-postcode";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+
+function Pagination({ pageInfo }) {
+  const navigate = useNavigate();
+  const pageNumbers = [];
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <Box>
+      {pageInfo.prevPageNumber && (
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/?p=" + pageInfo.prevPageNumber)}
+        >
+          <FontAwesomeIcon icon={faAngleLeft} />
+        </Button>
+      )}
+
+      {pageNumbers.map((pageNumber) => (
+        <Button
+          key={pageNumber}
+          variant={
+            pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+          }
+          onClick={() => navigate("/?p=" + pageNumber)}
+        >
+          {pageNumber}
+        </Button>
+      ))}
+
+      {pageInfo.nextPageNumber && (
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/?p=" + pageInfo.nextPageNumber)}
+        >
+          <FontAwesomeIcon icon={faAngleRight} />
+        </Button>
+      )}
+    </Box>
+  );
+}
 
 function App(props) {
   // ----------------------- 거래처 정보 상태 -----------------------
@@ -67,6 +111,8 @@ function App(props) {
   const navigate = useNavigate();
 
   const [params] = useSearchParams();
+  const location = useLocation();
+  const [pageInfo, setPageInfo] = useState(null);
 
   const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -121,10 +167,11 @@ function App(props) {
   // ------------------------------ 거래처 리스트 가져오기 ------------------------------
   useEffect(() => {
     const queryString = params.toString();
-    axios
-      .get("/api/account/list?" + queryString)
-      .then((response) => setCustomersList(response.data));
-  }, [params]);
+    axios.get("/api/account/list?" + queryString).then((response) => {
+      setCustomersList(response.data.accountList);
+      setPageInfo(response.data.pageInfo);
+    });
+  }, [location]);
 
   if (customersList === null) {
     return <Spinner />;
@@ -457,21 +504,21 @@ function App(props) {
                 ),
             )}
             {/*/!* 필요한 수만큼 빈 행을 추가 *!/*/}
-            {/*{[...Array(10 - customersList.length)].map((_, index) => (*/}
-            {/*  <Flex h={"49px"} key={index}>*/}
-            {/*    <Box*/}
-            {/*      p={3}*/}
-            {/*      w={"200px"}*/}
-            {/*      borderBottomWidth={"1px"}*/}
-            {/*      borderRightWidth={"1px"}*/}
-            {/*    >*/}
-            {/*      <Text>&nbsp;</Text>*/}
-            {/*    </Box>*/}
-            {/*    <Box p={3} w={"200px"} borderBottomWidth={"1px"}>*/}
-            {/*      <Text>&nbsp;</Text>*/}
-            {/*    </Box>*/}
-            {/*  </Flex>*/}
-            {/*))}*/}
+            {[...Array(10 - customersList.length)].map((_, index) => (
+              <Flex h={"49px"} key={index}>
+                <Box
+                  p={3}
+                  w={"200px"}
+                  borderBottomWidth={"1px"}
+                  borderRightWidth={"1px"}
+                >
+                  <Text>&nbsp;</Text>
+                </Box>
+                <Box p={3} w={"200px"} borderBottomWidth={"1px"}>
+                  <Text>&nbsp;</Text>
+                </Box>
+              </Flex>
+            ))}
           </Box>
         </Box>
 
@@ -824,6 +871,14 @@ function App(props) {
           </FormControl>
         </Box>
       </Flex>
+      <Box
+        justifyContent={"center"}
+        alignItems={"center"}
+        display={"flex"}
+        mt={10}
+      >
+        <Pagination pageInfo={pageInfo} />
+      </Box>
 
       {/* -------------------------- 삭제 모달 -------------------------- */}
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -862,14 +917,6 @@ function App(props) {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      <Box>
-        <Button onClick={() => navigate("/?p=1")}>1</Button>
-        <Button onClick={() => navigate("/?p=2")}>2</Button>
-        <Button onClick={() => navigate("/?p=3")}>3</Button>
-        <Button onClick={() => navigate("/?p=4")}>4</Button>
-        <Button onClick={() => navigate("/?p=5")}>5</Button>
-      </Box>
     </Box>
   );
 }
