@@ -35,6 +35,22 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 
+// ----------------------- 페이징 로직 -----------------------
+function PageButton({ variant, pageNumber, children }) {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+
+  function handleClick() {
+    params.set("p", pageNumber);
+    navigate("/?" + params);
+  }
+
+  return (
+    <Button variant={variant} onClick={handleClick}>
+      {children}
+    </Button>
+  );
+}
 function Pagination({ pageInfo }) {
   const navigate = useNavigate();
   const pageNumbers = [];
@@ -55,15 +71,15 @@ function Pagination({ pageInfo }) {
       )}
 
       {pageNumbers.map((pageNumber) => (
-        <Button
+        <PageButton
           key={pageNumber}
           variant={
             pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
           }
-          onClick={() => navigate("/?p=" + pageNumber)}
+          pageNumber={pageNumber}
         >
           {pageNumber}
-        </Button>
+        </PageButton>
       ))}
 
       {pageInfo.nextPageNumber && (
@@ -75,6 +91,71 @@ function Pagination({ pageInfo }) {
         </Button>
       )}
     </Box>
+  );
+}
+
+// ----------------------- 검색 로직 -----------------------
+function SearchComponent() {
+  const [businessNumber, setBusinessNumber] = useState("");
+  const [companyName, setCompanyName] = useState("");
+
+  const navigate = useNavigate();
+
+  function handleSearch() {
+    const params = new URLSearchParams();
+    if (businessNumber) {
+      params.set("b", businessNumber);
+    }
+    if (companyName) {
+      params.set("c", companyName);
+    }
+    navigate("/?" + params.toString());
+  }
+
+  // ------------ Input에서 엔터키 눌렀을때 조회버튼 클릭되는 로직 ------------
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  return (
+    <>
+      <Box p={3}>
+        <HStack mt={5}>
+          <Text w={"150px"}>사업자 번호</Text>
+          <Input
+            borderWidth={"2px"}
+            borderRadius={0}
+            onKeyDown={handleKeyDown}
+            value={businessNumber}
+            onChange={(e) => setBusinessNumber(e.target.value)}
+          />
+        </HStack>
+        <HStack mt={10} mb={5}>
+          <Text w={"150px"}>거래처명</Text>
+          <Input
+            borderWidth={"2px"}
+            borderRadius={0}
+            onKeyDown={handleKeyDown}
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+          />
+        </HStack>
+      </Box>
+      <Box
+        alignItems={"flex-end"}
+        display={"flex"}
+        justifyContent={"center"}
+        mb={8}
+        ml={5}
+        mr={3}
+      >
+        <Button borderWidth={"2px"} borderRadius={0} onClick={handleSearch}>
+          조회
+        </Button>
+      </Box>
+    </>
   );
 }
 
@@ -438,28 +519,31 @@ function App(props) {
       {/* ------------------------ 거래처 검색 하는곳 ------------------------@@*/}
       <Flex justifyContent={"center"} mt={5} alignItems={"start"}>
         <Box borderWidth={"2px"} maxW={"404px"}>
-          <Box p={3}>
-            <HStack mt={5}>
-              <Text w={"150px"}>사업자 번호</Text>
-              <Input borderWidth={"2px"} borderRadius={0} />
-            </HStack>
-            <HStack mt={10} mb={5}>
-              <Text w={"150px"}>거래처명</Text>
-              <Input borderWidth={"2px"} borderRadius={0} />
-            </HStack>
-          </Box>
-          <Box
-            alignItems={"flex-end"}
-            display={"flex"}
-            justifyContent={"center"}
-            mb={8}
-            ml={5}
-            mr={3}
-          >
-            <Button borderWidth={"2px"} borderRadius={0}>
-              조회
-            </Button>
-          </Box>
+          {/*<Box p={3}>*/}
+          {/*  <HStack mt={5}>*/}
+          {/*    <Text w={"150px"}>사업자 번호</Text>*/}
+          {/*    <Input borderWidth={"2px"} borderRadius={0} />*/}
+          {/*  </HStack>*/}
+          {/*  <HStack mt={10} mb={5}>*/}
+          {/*    <Text w={"150px"}>거래처명</Text>*/}
+          {/*    <Input borderWidth={"2px"} borderRadius={0} />*/}
+          {/*  </HStack>*/}
+          {/*</Box>*/}
+          {/*<Box*/}
+          {/*  alignItems={"flex-end"}*/}
+          {/*  display={"flex"}*/}
+          {/*  justifyContent={"center"}*/}
+          {/*  mb={8}*/}
+          {/*  ml={5}*/}
+          {/*  mr={3}*/}
+          {/*>*/}
+          {/*  <Button borderWidth={"2px"} borderRadius={0}>*/}
+          {/*    조회*/}
+          {/*  </Button>*/}
+          {/*</Box>*/}
+
+          <SearchComponent />
+
           <Box
             _hover={{ cursor: "pointer" }}
             align="stretch"
