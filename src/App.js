@@ -395,7 +395,6 @@ function App(props) {
         registrationDateTime: registrationDateTime,
         changeInformation: changeInformation,
         changeDateTime: changeDateTime,
-
         offices: offices,
         bankingInformation: bankingInformation,
         accountNumber: accountNumber,
@@ -519,29 +518,6 @@ function App(props) {
       {/* ------------------------ 거래처 검색 하는곳 ------------------------@@*/}
       <Flex justifyContent={"center"} mt={5} alignItems={"start"}>
         <Box borderWidth={"2px"} maxW={"404px"}>
-          {/*<Box p={3}>*/}
-          {/*  <HStack mt={5}>*/}
-          {/*    <Text w={"150px"}>사업자 번호</Text>*/}
-          {/*    <Input borderWidth={"2px"} borderRadius={0} />*/}
-          {/*  </HStack>*/}
-          {/*  <HStack mt={10} mb={5}>*/}
-          {/*    <Text w={"150px"}>거래처명</Text>*/}
-          {/*    <Input borderWidth={"2px"} borderRadius={0} />*/}
-          {/*  </HStack>*/}
-          {/*</Box>*/}
-          {/*<Box*/}
-          {/*  alignItems={"flex-end"}*/}
-          {/*  display={"flex"}*/}
-          {/*  justifyContent={"center"}*/}
-          {/*  mb={8}*/}
-          {/*  ml={5}*/}
-          {/*  mr={3}*/}
-          {/*>*/}
-          {/*  <Button borderWidth={"2px"} borderRadius={0}>*/}
-          {/*    조회*/}
-          {/*  </Button>*/}
-          {/*</Box>*/}
-
           <SearchComponent />
 
           <Box
@@ -587,7 +563,7 @@ function App(props) {
                   </Flex>
                 ),
             )}
-            {/*/!* 필요한 수만큼 빈 행을 추가 *!/*/}
+            {/* 필요한 수만큼 빈 행을 추가 */}
             {[...Array(10 - customersList.length)].map((_, index) => (
               <Flex h={"49px"} key={index}>
                 <Box
